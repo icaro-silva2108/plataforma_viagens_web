@@ -1,13 +1,15 @@
 from app.database.connection import get_connection
-from app.services.utilities import search_user_by_email
+from app.services import utilities
+from app.services import security
 
 """
 Variáveis 'conn'(conexão ao banco) e 'cursor'(meio entre python e banco) recebendo None servem de garantia para que elas existam e não quebrem o código.
-A variável 'sql' é um código sql a ser executado pelo comando cursor.execute(...)
-A variável 'sql' possui Placeholders(%s) contra sql injection
-conn.comit() acompanha o cursor.execute() para salvar as alterações feitas no database
+A variável 'sql' é um código sql a ser executado pelo comando cursor.execute(...).
+A variável 'sql' possui Placeholders(%s) contra sql injection.
+conn.comit() acompanha o cursor.execute() para salvar as alterações feitas no database.
 Blocos finally servem para garantir que a conexão e o cursor serão interrompidos, impedindo acesso desnecessário ao banco e consumo de memória.
-Blocos except tratam o retorno do database a um estado estável com rollback e apresenta o erro ocorrido
+Blocos except tratam o retorno do database a um estado estável com rollback e apresenta o erro ocorrido.
+O bloco cursor.rowcount é para fins de verificação de alterações no banco. Se houve alteração salva com commit, se não houve retorna ao estado anterior.
 """
 
 def create_user(name, email, password_hash, birth_date):# --> Criação de novo usuário
@@ -21,9 +23,9 @@ def create_user(name, email, password_hash, birth_date):# --> Criação de novo 
 
         email_query = "SELECT EXISTS(SELECT 1 FROM users WHERE email = %s)"# --> Query separada para verificar se o emil já existe
         cursor.execute(email_query, (email,))
-        result_query = bool(cursor.fetchone()[0])
+        email_exists = bool(cursor.fetchone()[0])
 
-        if not result_query:
+        if not email_exists:
             sql = "INSERT INTO users (name, email, password_hash, birth_date) VALUES (%s, %s, %s, %s);"
             cursor.execute(sql, (name, email, password_hash, birth_date))
 
@@ -44,7 +46,7 @@ def create_user(name, email, password_hash, birth_date):# --> Criação de novo 
         if conn:
             conn.close()
 
-def delete_user(email):# --> Exclui o cadastro do usuário
+def delete_user(user_id):# --> Exclui o cadastro do usuário
 
     conn = None
     cursor = None
@@ -53,25 +55,22 @@ def delete_user(email):# --> Exclui o cadastro do usuário
         conn = get_connection()
         cursor = conn.cursor()
 
-        user_id = search_user_by_email(email)
-        if not user_id:
-            return False
-        
-        rows_select = ("SELECT COUNT(*) FROM reservations WHERE user_id = %s;")
+        rows_select = ("SELECT COUNT(*) FROM reservations WHERE user_id = %s;")# --> Verifica se o usuário tem reservas
         cursor.execute(rows_select, (user_id,))
-        rows = cursor.fetchone()[0]#--> Verifica se o usuário tem reservas
+        rows = cursor.fetchone()[0]
 
-        if rows < 1:    
-
-            sql = ("DELETE FROM users WHERE id = %s;")
-
-            cursor.execute(sql, (user_id,))
-            
+        if rows > 0:    
+            return False# -->Não pode deletar se houver reservas
+        
+        sql = ("DELETE FROM users WHERE id = %s;")# --> Tenta deletar o usuário
+        cursor.execute(sql, (user_id,))
+        
+        if cursor.rowcount > 0:
             conn.commit()
             return True# --> Se usuário não tiver reservas, confirma que teve o cadastro excluído
-
         else:
-            return False# --> Se tiver, mostra que não foi possível ser excluído e deve deletar as reservas antes
+            conn.rollback()
+            return False# --> Se usuário não existia, retorna ao estado anterior
 
     except Exception as e:
         if conn:
@@ -84,7 +83,7 @@ def delete_user(email):# --> Exclui o cadastro do usuário
         if conn:
             conn.close()
 
-def change_user_info(email, info: dict):# --> Altera informações de cadastro do usuário que forem permitidas
+def change_user_info(user_id, info: dict):# --> Altera informações de cadastro do usuário que forem permitidas
     
     conn = None
     cursor = None
@@ -94,8 +93,6 @@ def change_user_info(email, info: dict):# --> Altera informações de cadastro d
     try:
         conn = get_connection()
         cursor = conn.cursor()
-
-        user_id = search_user_by_email(email)
 
         keys_to_change = []# --> Guardas os nome das chaves(colunas do database) para serem aplicadas no sql
         new_values = []# --> Guarda os novos valores que vão substituir os antigos do database
@@ -119,8 +116,13 @@ def change_user_info(email, info: dict):# --> Altera informações de cadastro d
             new_values.append(user_id)# --> Adiciona o id do usuário no fim da lista dos valores para facilitar no uso do Placeholder
 
             cursor.execute(sql, (tuple(new_values),))
-            conn.commit()
-            return True# --> Retorna que as alterações foram executadas com sucesso
+            
+            if cursor.rowcount > 0:
+                conn.commit()
+                return True# --> Retorna que as alterações foram executadas com sucesso
+            else:
+                conn.rollback()
+                return False
 
         else:
             return False# --> Se não houver nada no para modificar, mostra que não foi possível fazer as alterações
@@ -137,3 +139,20 @@ def change_user_info(email, info: dict):# --> Altera informações de cadastro d
             cursor.close()
         if conn:
             conn.close()
+
+def login(email, password):
+
+    try:
+        user_id = utilities.search_user_by_email(email)
+        password_hash = utilities.get_password_hash(email)
+
+        if not user_id or not password_hash:
+            return None
+
+        if security.check_password(password, password_hash):
+            return user_id
+        else:
+            return None
+
+    except Exception as e:
+        raise e

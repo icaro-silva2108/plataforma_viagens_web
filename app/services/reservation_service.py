@@ -3,14 +3,15 @@ from app.services.utilities import search_user_by_email
 
 """
 Variáveis 'conn'(conexão ao banco) e 'cursor'(meio entre python e banco) recebendo None servem de garantia para que elas existam e não quebrem o código.
-A variável 'sql' é um código sql a ser executado pelo comando cursor.execute(...)
-A variável 'sql' possui Placeholders(%s) contra sql injection
-conn.comit() acompanha o cursor.execute() para salvar as alterações feitas no database
+A variável 'sql' é um código sql a ser executado pelo comando cursor.execute(...).
+A variável 'sql' possui Placeholders(%s) contra sql injection.
+conn.comit() acompanha o cursor.execute() para salvar as alterações feitas no database.
 Blocos finally servem para garantir que a conexão e o cursor serão interrompidos, impedindo acesso desnecessário ao banco e consumo de memória.
-Blocos except tratam o retorno do database a um estado estável com rollback e apresenta o erro ocorrido
+Blocos except tratam o retorno do database a um estado estável com rollback e apresenta o erro ocorrido.
+O bloco cursor.rowcount é para fins de verificação de alterações no banco. Se houve alteração salva com commit, se não houve retorna ao estado anterior.
 """
 
-def create_reservation(email, destination_id, travel_date):# --> Cria nova reserva
+def create_reservation(user_id, destination_id, travel_date):# --> Cria nova reserva
 
     conn = None
     cursor = None
@@ -19,19 +20,13 @@ def create_reservation(email, destination_id, travel_date):# --> Cria nova reser
         conn = get_connection()
         cursor = conn.cursor()
 
-        user_id = search_user_by_email(email)
+        sql = "INSERT INTO reservations (user_id, destination_id, travel_date) VALUES (%s, %s, %s)"
 
-        if user_id:
-            sql = "INSERT INTO reservations (user_id, destination_id, travel_date) VALUES (%s, %s, %s)"
+        cursor.execute(sql, (user_id, destination_id, travel_date))
 
-            cursor.execute(sql, (user_id, destination_id, travel_date))
-
-            conn.commit()
-            return True# --> Confirma que a reserva foi criada
-
-        else:
-            return False# --> Mostra que não foi possível criar a reserva
-        
+        conn.commit()
+        return True# --> Confirma que a reserva foi criada
+    
     except Exception as e:
         if conn:
             conn.rollback()
@@ -43,7 +38,7 @@ def create_reservation(email, destination_id, travel_date):# --> Cria nova reser
         if conn:
             conn.close()
 
-def cancel_reservation(reservation_id, email):# --> Cancela uma reserva por referência de email(por ser único para cada usuário) e id da reserva especificando qual será cancelada
+def cancel_reservation(reservation_id, user_id):# --> Cancela uma reserva por referência de email(por ser único para cada usuário) e id da reserva especificando qual será cancelada
 
     conn = None
     cursor = None
@@ -52,18 +47,16 @@ def cancel_reservation(reservation_id, email):# --> Cancela uma reserva por refe
         conn = get_connection()
         cursor = conn.cursor()
 
-        user_id = search_user_by_email(email)
+        sql = "DELETE FROM reservations WHERE id = %s AND user_id = %s"# --> Identifica o id do usuário pelo email através de uma subquery
 
-        if user_id:
-            sql = "DELETE FROM reservations WHERE id = %s AND user_id = %s"# --> Identifica o id do usuário pelo email através de uma subquery
+        cursor.execute(sql, (reservation_id, user_id))
 
-            cursor.execute(sql, (reservation_id, user_id))
-
+        if cursor.rowcount > 0:
             conn.commit()
             return True# --> Confirma que a reserva foi cancelada
-
         else:
-            return False# --> Mostra que não foi possível cancelar a reserva
+            conn.rollback()
+            return False# --> A reserva não existia ou não pertencia a
 
     except Exception as e:
         if conn:
@@ -76,7 +69,7 @@ def cancel_reservation(reservation_id, email):# --> Cancela uma reserva por refe
         if conn:
             conn.close()
 
-def show_reservations(email):# --> Mostra as reservas feitas pelo usuário através de seu id
+def show_reservations(user_id):# --> Mostra as reservas feitas pelo usuário através de seu id
 
     conn = None
     cursor = None
@@ -84,8 +77,6 @@ def show_reservations(email):# --> Mostra as reservas feitas pelo usuário atrav
     try:
         conn = get_connection()
         cursor = conn.cursor()
-
-        user_id = search_user_by_email(email)
 
         sql ="""SELECT
                 r.id, 
