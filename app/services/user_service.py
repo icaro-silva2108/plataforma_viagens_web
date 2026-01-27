@@ -96,11 +96,11 @@ def change_user_info(user_id, info: dict):# --> Altera informações de cadastro
 
         keys_to_change = []# --> Guardas os nome das chaves(colunas do database) para serem aplicadas no sql
         new_values = []# --> Guarda os novos valores que vão substituir os antigos do database
-        sql_string = ""# --> String para auxiliar na execuçõa do comando sql
+        sql_string = ""# --> String para auxiliar na execução do comando sql
 
         if info:
             for key, value in info.items():
-                if key in allowed_keys:# --> Só serão substituiádos os registros de colunas permitidas
+                if key in allowed_keys:# --> Só serão substituídos os registros de colunas permitidas
                     keys_to_change.append(key)
                     new_values.append(value)
 

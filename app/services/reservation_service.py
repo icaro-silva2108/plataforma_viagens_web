@@ -26,7 +26,7 @@ def create_reservation(user_id, destination_id, travel_date):# --> Cria nova res
 
         conn.commit()
         return True# --> Confirma que a reserva foi criada
-    
+
     except Exception as e:
         if conn:
             conn.rollback()
@@ -56,7 +56,7 @@ def cancel_reservation(reservation_id, user_id):# --> Cancela uma reserva por re
             return True# --> Confirma que a reserva foi cancelada
         else:
             conn.rollback()
-            return False# --> A reserva não existia ou não pertencia a
+            return False# --> A reserva não existia ou não pertencia ao usuário
 
     except Exception as e:
         if conn:

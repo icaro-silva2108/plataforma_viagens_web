@@ -63,7 +63,7 @@ def get_password_hash(email):# --> Encontra o hash da senha do usuário através
         if conn:
             conn.close()
 
-def get_name_user(user_id):
+def get_name_user(user_id):# --> Retorna o nome do usuário a partir do seu id
 
     conn = None
     cursor = None
@@ -72,16 +72,16 @@ def get_name_user(user_id):
         conn = get_connection()
         cursor = conn.cursor()
 
-        if user_id:
+        if user_id:# --> Confere se o usuário existe
 
             sql = "SELECT name FROM users WHERE id = %s"
             cursor.execute(sql, (user_id, ))
             name = cursor.fetchone()[0]
 
-            return name
+            return name# --> Se encontrar, retorna o nome buscado no database.
 
         else:
-            return None
+            return None# --> Caso, contrário, retorna None
 
     except Exception as e:
         raise e
@@ -92,7 +92,7 @@ def get_name_user(user_id):
         if conn:
             conn.close()
 
-def search_destination(destination_id):
+def search_destination(destination_id):# --> Procura o id do destino para fazer verificações de existência e retorna o id verificado
 
     conn = None
     cursor = None
@@ -106,7 +106,7 @@ def search_destination(destination_id):
         id_row = cursor.fetchone()
 
         if id_row:
-            return destination_id# --> Se existir, retorna o id da reserva verificado
+            return id_row[0]# --> Se existir, retorna o id da reserva verificado
         else:
             return None# --> Se não houver, indica que não encontrou
 

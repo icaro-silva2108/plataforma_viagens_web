@@ -20,14 +20,24 @@ def menu():
             name_user = utilities.get_name_user(logged_user)
             while True:
 
-                user_action  = input(f"""Olá {name_user}, como posso te ajudar hoje?
-                                     0 - Fazer uma reserva
-                                     1 - Cancelar uma reserva
-                                     2 - Mostrar minhas reservas
-                                     3 - Mostrar destinos disponíveis
-                                     4 - Alterar meu cadastro
-                                     5 - Cancelar meu cadastro
-                                     6 - Sair""")
+                user_action  = int(input(f"""Olá {name_user}, como posso te ajudar hoje?
+                                     1 - Fazer uma reserva
+                                     2 - Cancelar uma reserva
+                                     3 - Mostrar minhas reservas
+                                     4 - Mostrar destinos disponíveis
+                                     5 - Alterar meu cadastro
+                                     6 - Cancelar meu cadastro
+                                     0 - Sair"""))
                 
+                if user_action == 1:
+                    success = cli.action_create_reservation(logged_user)
+
+                    if success:
+                        print("Reserva criada com sucesso!")
+                    else:
+                        print("Não foi possível criar a reserva.")
+                
+                elif user_action == 2:
+                    success = cli.action_cancel_reservation(logged_user)
     except Exception as e:
         raise e
