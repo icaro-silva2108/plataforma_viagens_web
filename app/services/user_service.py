@@ -28,7 +28,10 @@ def create_user(name, email, password_hash, birth_date):# --> Criação de novo 
         conn.commit()
 
         user_id = cursor.lastrowid
-        return user_id# --> Se não existir, confirma que o usuário foi criado e retorna o id
+        if user_id:
+            return user_id# --> Se não existir, confirma que o usuário foi criado e retorna o id
+        else:
+            return None
 
     except IntegrityError:
         return None

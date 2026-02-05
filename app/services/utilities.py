@@ -30,6 +30,35 @@ def search_user_info(email):
         if conn:
             conn.close()
 
+def search_user_by_id(user_id):
+
+    conn = None
+    cursor = None
+
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        sql = """
+            SELECT name, email, birth_date
+            FROM users
+            WHERE id = %s;
+            """
+
+        cursor.execute(sql, (user_id, ))
+        user = cursor.fetchone()
+
+        return user
+
+    except Exception:
+        raise
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 def search_destination(destination_id):# --> Procura o id do destino para fazer verificações de existência e retorna o id verificado
 
     conn = None

@@ -24,7 +24,12 @@ def create_reservation(user_id, destination_id, travel_date):# --> Cria nova res
         cursor.execute(sql, (user_id, destination_id, travel_date))
 
         conn.commit()
-        return True# --> Confirma que a reserva foi criada
+
+        reservation_id = cursor.lastrowid
+        if reservation_id:
+            return reservation_id # --> Confirma que a reserva foi criada
+        else:
+            return None
 
     except Exception:
         if conn:
@@ -84,7 +89,8 @@ def show_reservations(user_id):# --> Mostra as reservas feitas pelo usuário atr
             d.country, 
             r.travel_date, 
             r.status, 
-            d.price
+            d.price,
+            d.img_url
             FROM destinations d
             INNER JOIN reservations r ON d.id = r.destination_id
             WHERE r.user_id = %s

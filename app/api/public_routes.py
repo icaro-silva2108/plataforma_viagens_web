@@ -1,11 +1,11 @@
 from flask import Blueprint, request, jsonify
-from app.services import user_service, utilities, security
+from app.services import user_service, destination_service, utilities, security
 from flask_jwt_extended import create_access_token
 
 public_routes = Blueprint("public_routes", __name__)
 
-@public_routes.route("/register" , methods = ["POST"])
-def register():
+@public_routes.route("/signup" , methods = ["POST"])
+def sign_up():
 
     data = request.get_json()
     if not data:
@@ -73,8 +73,8 @@ def register():
         "email" : email
         }), 201
 
-@public_routes.route("/login", methods=["POST"])
-def login():
+@public_routes.route("/signin", methods=["POST"])
+def sign_in():
 
     data = request.get_json()
     if not data:
@@ -98,9 +98,9 @@ def login():
         return jsonify({
             "success" : False,
             "message" : "Email ou senha inválidos."
-        }), 401
+            }), 401
 
-    user_token = create_access_token(identity=logged["id"])
+    user_token = create_access_token(identity=str(logged["id"]))
 
     return jsonify({
         "success" : True,
@@ -108,4 +108,31 @@ def login():
         "name" : logged["name"],
         "email" : logged["email"],
         "token" : user_token
-    }), 200
+        }), 200
+
+@public_routes.route("/destinations", methods=["GET"])
+def show_homepage_destinations():
+
+    destinations = destination_service.show_destinations()
+
+    if not destinations:
+        return jsonify({
+            "success" : True,
+            "destinations" : []
+            }), 200
+
+    results = []
+    for d in destinations:
+        results.append({
+            "id" : d[0],
+            "city" : d[1],
+            "country" : d[2],
+            "description" : d[3],
+            "price" : float(d[4]),
+            "img_url" : d[5]
+        })
+
+    return jsonify({
+        "success" : True,
+        "destinations" : results
+        }), 200

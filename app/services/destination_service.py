@@ -16,7 +16,7 @@ def show_destinations():
         conn = get_connection()
         cursor = conn.cursor()
 
-        sql = "SELECT id, city, country, description, price FROM destinations WHERE active = TRUE;"
+        sql = "SELECT id, city, country, description, price, img_url FROM destinations WHERE active = TRUE;"
         cursor.execute(sql)
         results = cursor.fetchall()
 
