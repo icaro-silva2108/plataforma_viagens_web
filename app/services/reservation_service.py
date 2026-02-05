@@ -26,10 +26,10 @@ def create_reservation(user_id, destination_id, travel_date):# --> Cria nova res
         conn.commit()
         return True# --> Confirma que a reserva foi criada
 
-    except Exception as e:
+    except Exception:
         if conn:
             conn.rollback()
-        raise e
+        raise
 
     finally:
         if cursor:
@@ -57,10 +57,10 @@ def cancel_reservation(reservation_id, user_id):# --> Cancela uma reserva por re
             conn.rollback()
             return False# --> A reserva não existia ou não pertencia ao usuário
 
-    except Exception as e:
+    except Exception:
         if conn:
             conn.rollback()
-        raise e
+        raise
 
     finally:
         if cursor:
@@ -77,23 +77,25 @@ def show_reservations(user_id):# --> Mostra as reservas feitas pelo usuário atr
         conn = get_connection()
         cursor = conn.cursor()
 
-        sql ="""SELECT
-                r.id, 
-                d.city, 
-                d.country, 
-                r.travel_date, 
-                r.status, 
-                d.price
-                FROM destinations d
-                INNER JOIN reservations r ON d.id = r.destination_id
-                WHERE r.user_id = %s"""
+        sql = """
+            SELECT
+            r.id, 
+            d.city, 
+            d.country, 
+            r.travel_date, 
+            r.status, 
+            d.price
+            FROM destinations d
+            INNER JOIN reservations r ON d.id = r.destination_id
+            WHERE r.user_id = %s
+            """
 
         cursor.execute(sql, (user_id,))
         results = cursor.fetchall()
         return results# --> Retorna as reservas buscadas pelo id do usuário
 
-    except Exception as e:
-        raise e
+    except Exception:
+        raise
 
     finally:
         if cursor:

@@ -1,6 +1,7 @@
 from app.database.connection import get_connection
 from app.services import utilities
 from app.services import security
+from mysql.connector import IntegrityError
 
 """
 Variáveis 'conn'(conexão ao banco) e 'cursor'(meio entre python e banco) recebendo None servem de garantia para que elas existam e não quebrem o código.
@@ -21,24 +22,16 @@ def create_user(name, email, password_hash, birth_date):# --> Criação de novo 
         conn = get_connection()
         cursor = conn.cursor()
 
-        email_query = "SELECT EXISTS(SELECT 1 FROM users WHERE email = %s)"# --> Query separada para verificar se o emil já existe
-        cursor.execute(email_query, (email,))
-        email_exists = bool(cursor.fetchone()[0])
+        sql = "INSERT INTO users (name, email, password_hash, birth_date) VALUES (%s, %s, %s, %s);"
+        cursor.execute(sql, (name, email, password_hash, birth_date))
 
-        if not email_exists:
-            sql = "INSERT INTO users (name, email, password_hash, birth_date) VALUES (%s, %s, %s, %s);"
-            cursor.execute(sql, (name, email, password_hash, birth_date))
+        conn.commit()
 
-            conn.commit()
-            return True# --> Se não existir, confirma que o usuário foi criado
+        user_id = cursor.lastrowid
+        return user_id# --> Se não existir, confirma que o usuário foi criado e retorna o id
 
-        else:
-            return False# --> Se existir, não poderá criar um usuário com o mesmo email
-
-    except Exception as e:
-        if conn:
-            conn.rollback()
-        raise e
+    except IntegrityError:
+        return None
 
     finally:
         if cursor:
@@ -72,10 +65,10 @@ def delete_user(user_id):# --> Exclui o cadastro do usuário
             conn.rollback()
             return False# --> Se usuário não existia, retorna ao estado anterior
 
-    except Exception as e:
+    except Exception:
         if conn:
             conn.rollback()
-        raise e
+        raise
 
     finally:
         if cursor:
@@ -109,9 +102,11 @@ def change_user_info(user_id, info: dict):# --> Altera informações de cadastro
 
             sql_string = ",".join(f"{key} = %s" for key in keys_to_change)# --> Monta a string de forma adequada para executar o comando sql
 
-            sql =f"""UPDATE users
-                    SET {sql_string}
-                    WHERE id = %s"""
+            sql = f"""
+                UPDATE users
+                SET {sql_string}
+                WHERE id = %s
+                """
 
             new_values.append(user_id)# --> Adiciona o id do usuário no fim da lista dos valores para facilitar no uso do Placeholder
 
@@ -129,10 +124,10 @@ def change_user_info(user_id, info: dict):# --> Altera informações de cadastro
 
 
 
-    except Exception as e:
+    except Exception:
         if conn:
             conn.rollback()
-        raise e
+        raise
 
     finally:
         if cursor:
@@ -142,17 +137,18 @@ def change_user_info(user_id, info: dict):# --> Altera informações de cadastro
 
 def login(email, password):
 
-    try:
-        user_id = utilities.search_user_by_email(email)
-        password_hash = utilities.get_password_hash(email)
+    user_info = utilities.search_user_info(email)
 
-        if not user_id or not password_hash:
-            return None
+    if not user_info:
+        return None
 
-        if security.check_password(password, password_hash):
-            return user_id
-        else:
-            return None
+    user_id, name, password_hash = user_info
 
-    except Exception as e:
-        raise e
+    if not security.check_password(password, password_hash):
+        return None
+
+    return {
+        "id" : user_id,
+        "name" : name,
+        "email" : email
+        }

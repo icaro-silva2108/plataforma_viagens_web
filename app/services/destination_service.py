@@ -25,8 +25,8 @@ def show_destinations():
 
         return results# --> Retorna os destinos disponíveis buscados no database
 
-    except Exception as e:
-        raise e
+    except Exception:
+        raise
 
     finally:
         if cursor:

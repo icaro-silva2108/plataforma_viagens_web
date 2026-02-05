@@ -23,6 +23,8 @@ Projeto pessoal de chatbot de atendimento para viagens que envolve funções com
 
 # Estrutura do Projeto
 Dentro da pasta central app, há a pasta database onde pode se encontrar o script sql para o CRUD de usuários e a criação de tabelas destinations(para destinos) e reservations(para reservas).
+A pasta api contém arquivos para ligar o server, definir rotas e configurar JWT.
+Interfaces é para fins de teste da ligação com database.
 Também há uma pasta de services para aplicar as funções voltadas aos usuários e serviços como um todo.
 Além disso possui arquivos utilitários para as necessidades da aplicação.
 
@@ -35,5 +37,5 @@ Trata-se de um projeto visando o desenvolvimento pessoal e a possibilidade de da
 consolidar a minha formação como desenvolvedor.
 
 # Próximos passos
-• Migração do projeto para API.<br>
+• Finalização da API.<br>
 • Posteriormente, desenvolvimento da interface web.

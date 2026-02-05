@@ -1,39 +1,7 @@
 from app.database.connection import get_connection
+from datetime import datetime, date
 
-def search_user_by_email(email):
-
-    conn = None
-    cursor = None
-
-    try:
-        conn = get_connection()
-        cursor = conn.cursor()
-
-        email_query = "SELECT EXISTS(SELECT 1 FROM users WHERE email = %s)"
-        cursor.execute(email_query, (email,))
-        email_result = bool(cursor.fetchone()[0])# --> Garante que exista um usuário a ser buscado
-
-        if email_result:
-
-            id_query = "SELECT id FROM users WHERE email = %s;"
-            cursor.execute(id_query, (email,))
-            user_id = cursor.fetchone()[0]
-
-            return user_id# --> Retorna o id do usuário buscado pelo email
-
-        else:
-            return None# --> Se não encontrar, retorna None
-
-    except Exception as e:
-        raise e
-
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
-
-def get_password_hash(email):# --> Encontra o hash da senha do usuário através do email para fazer verificação no login em user_service
+def search_user_info(email):
 
     conn = None
     cursor = None
@@ -42,49 +10,19 @@ def get_password_hash(email):# --> Encontra o hash da senha do usuário através
         conn = get_connection()
         cursor = conn.cursor()
 
-        user_id = search_user_by_email(email)# --> Verifica se o usuário existe
-        if user_id:
+        sql = """
+            SELECT id, name, password_hash
+            FROM users 
+            WHERE email = %s;
+            """
 
-            sql = "SELECT password_hash FROM users WHERE email = %s"
-            cursor.execute(sql, (email, ))
-            pw_hash = cursor.fetchone()[0]# --> Se existir, busca pela hash de senha dele
+        cursor.execute(sql, (email,))
+        user_info = cursor.fetchone()
 
-            return pw_hash
+        return user_info# --> Retorna as informações do usuário, ou None se não existir.
 
-        else:
-            return None# --> Se não achar, retorna None e barra o login se a senha estiver errada
-
-    except Exception as e:
-        raise e
-
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
-
-def get_name_user(user_id):# --> Retorna o nome do usuário a partir do seu id
-
-    conn = None
-    cursor = None
-
-    try:
-        conn = get_connection()
-        cursor = conn.cursor()
-
-        if user_id:# --> Confere se o usuário existe
-
-            sql = "SELECT name FROM users WHERE id = %s"
-            cursor.execute(sql, (user_id, ))
-            name = cursor.fetchone()[0]
-
-            return name# --> Se encontrar, retorna o nome buscado no database.
-
-        else:
-            return None# --> Caso, contrário, retorna None
-
-    except Exception as e:
-        raise e
+    except Exception:
+        raise
 
     finally:
         if cursor:
@@ -110,11 +48,40 @@ def search_destination(destination_id):# --> Procura o id do destino para fazer 
         else:
             return None# --> Se não houver, indica que não encontrou
 
-    except Exception as e:
-        raise e
+    except Exception:
+        raise
 
     finally:
         if cursor:
             cursor.close()
         if conn:
             conn.close()
+
+def birth_date_validation(birth_date_str):
+
+    try:
+        birth_date = datetime.strptime(birth_date_str, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+    today = date.today()
+    age = today.year - birth_date.year
+
+    if (today.month, today.day) < (birth_date.month, birth_date.day):
+        age -= 1
+    if age < 16:
+        return None
+
+    return birth_date
+
+def travel_date_validation(travel_date_str):
+
+    try:
+        travel_date = datetime.strptime(travel_date_str, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+    if travel_date <= date.today():
+        return None
+
+    return travel_date
