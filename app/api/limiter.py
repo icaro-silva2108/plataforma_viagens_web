@@ -5,10 +5,10 @@ from flask_limiter import Limiter
 # Identificação para rate limiter(JWT ou IP)
 def jwt_or_ip_identifier():
 
-    jwt_identifier = verify_jwt_in_request(optional=True)
-    if jwt_identifier:
+    try:
+        verify_jwt_in_request(optional=True)
         return str(get_jwt_identity())
-    else:
+    except Exception:
         return request.remote_addr
 
 limiter = Limiter(

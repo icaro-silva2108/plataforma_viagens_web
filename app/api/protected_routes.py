@@ -364,20 +364,6 @@ def refresh():
                 "message" : "Usuário não existe ou não está autorizado"
                 }), 401
 
-        # ID refresh token
-        refresh_id = get_jwt().get("refresh_id")
-        if not refresh_id:
-            return jsonify({
-                "success" : False,
-                "message" : "Refresh ID ausente no Token"
-                }), 400
-
-        if utilities.search_revoked_token(refresh_id):
-            return jsonify({
-                "success" : False,
-                "message" : "Refresh Token revogado."
-                }), 401
-
         # Novo access token que mantém sessão
         new_access_token = create_access_token(identity=user_id)
         return jsonify({
@@ -403,7 +389,7 @@ def logout():
             return jsonify({
                 "success" : False,
                 "message" : "Refresh ID ausente no Token"
-                })
+                }), 400
 
         # Confirmação de revogação
         revoke_confirm = utilities.add_revoked_tokens(refresh_id)
