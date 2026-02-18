@@ -126,6 +126,5 @@ Running on http://127.0.0.1:5000
 
 Exemplo(Rota pública, não precisa de autenticação):
 ```console
-GET (http://127.0.0.1:5000/api/destinations)
-
+GET http://127.0.0.1:5000/destinations
 ```
