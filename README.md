@@ -12,7 +12,8 @@ Projeto pessoal de plataforma de viagens web que envolve funções como:
 # :iphone: Tecnologias Utilizadas:
 - Python  
 - MySQL  
-- Flask
+- Flask  
+- Pytest
 
 ## :books: Bibliotecas Utilizadas(Até o momento)
 
@@ -28,13 +29,14 @@ Projeto pessoal de plataforma de viagens web que envolve funções como:
 - bcrypt(Hasheamento de senhas e validação para login)  
 - flask(Para requests e reponses em json, blueprint de rotas)  
 - flask-jwt-extended(Para autenticação com JWT e configuração do manager JWT)  
-- flask_limiter(Rate limit de requisições das rotas)
+- flask_limiter(Rate limit de requisições das rotas)  
+- pytest(Testes Automatizados)
 
 # :bookmark_tabs: Estrutura do Projeto
 - app/  
     - database/: Scripts SQL e conexão com o banco  
     - api/: Rotas, JWTmanager e rate limiter  
-    - interfaces/: Testes  
+    - test/: Testes  
     - services/: Regras de negócio, utilities e security(para hasheamento de senhas)
 
 # :chart_with_upwards_trend: Objetivo do Projeto
@@ -46,9 +48,8 @@ Trata-se de um projeto visando o desenvolvimento pessoal e a possibilidade de da
 consolidar a minha formação como desenvolvedor.
 
 # :hourglass: Próximos Passos
-- Novos testes no postman.  
-- Testes automatizados.  
-- Melhorar documentação.  
+- Finalizar testes automatizados.  
+- Atualizar documentação ao longo do projeto.  
 - Posteriormente, foco em desenvolvimento frontend.
 
 
