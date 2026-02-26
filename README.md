@@ -127,22 +127,5 @@ Running on http://127.0.0.1:5000
 
 Exemplo(Rota pública, não precisa de autenticação):
 ```console
-GET http://127.0.0.1:5000/destinations
+GET http://127.0.0.1:5000/api/destinations
 ```
-
-# Testes da API no Postman(Cadastro de Usuário e Criação de uma Reserva)
-
-- Erro de formatação de email
-![email_format_error](imgs/postman_print_tests/email_format_error.png)
-- Email que já está sendo utilizado
-![email_already_used](imgs/postman_print_tests/email_already_used.png)
-- Erro de confirmação da senha
-![password_confirm_error](imgs/postman_print_tests/password_confirm_error.png)
-- Data para criação de conta inválida
-![invalid_birth_date](imgs/postman_print_tests/invalid_birth_date.png)
-- Com todos dados sem erro de formato/confirmação é possível fazer o login
-![successful_login](imgs/postman_print_tests/successful_login.png)
-- Tentativa de criar reserva sem token
-![missing_token_error](imgs/postman_print_tests/missing_token_error.png)
-- Criação da reserva com token
-![reservation_created](imgs/postman_print_tests/reservation_created.png)
