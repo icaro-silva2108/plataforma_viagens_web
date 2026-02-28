@@ -49,16 +49,17 @@ def auth_fixture(client_no_ratelimit):
         assert response_signup.status_code == 201
         assert response_signin.status_code == 200
 
+        user_id = response_signin.json["user_id"]
+
         yield {
             "client" : client,
             "access_token" : response_signin.json["access_token"],
-            "refresh_token" : response_signin.json["refresh_token"],
-            "email" : email
+            "refresh_token" : response_signin.json["refresh_token"]
         }
 
     finally:
         if cursor:
-            cursor.execute("DELETE FROM users WHERE email = %s", (email, ))
+            cursor.execute("DELETE FROM users WHERE id = %s", (user_id, ))
             conn.commit()
             cursor.close()
         if conn:

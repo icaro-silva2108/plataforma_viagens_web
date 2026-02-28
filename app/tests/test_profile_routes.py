@@ -45,8 +45,6 @@ def test_patch_profile_route(user_tokens):
 
     finally:
         if cursor:
-            cursor.execute("DELETE FROM users WHERE email = %s", (email, ))
-            conn.commit()
             cursor.close()
         if conn:
             conn.close()
