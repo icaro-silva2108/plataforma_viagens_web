@@ -21,7 +21,8 @@ Projeto pessoal de plataforma de viagens web que envolve funções como:
 - os(Para variáveis de ambiente - Complementar dotenv)  
 - datetime(Conversão para objeto data e verificação de datas válidas)  
 - re(Validação de formato de email)  
-- uuid(Geração de ID aleatório para blacklist de tokens)
+- uuid(Geração de ID aleatório para blacklist de tokens)  
+- unittest(Para auxiliar testes com mocks)
 
 ### :dvd: Bibliotecas Externas
 - mysql.connector(Integrar o Python ao banco MySQL)  
