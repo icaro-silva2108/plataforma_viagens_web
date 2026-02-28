@@ -1,4 +1,3 @@
-from main import app
 from app.database.connection import get_connection
 import uuid
 

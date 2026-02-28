@@ -2,6 +2,7 @@ import pytest
 from main import app
 from app.database.connection import get_connection
 from app.api.limiter import limiter
+from unittest.mock import patch
 import uuid
 
 # Cria client que trata 'Too many requests[429]' durante os testes
@@ -64,3 +65,9 @@ def auth_fixture(client_no_ratelimit):
             cursor.close()
         if conn:
             conn.close()
+
+@pytest.fixture(scope="function")
+def mock_none_identity_fixture():
+
+    with patch("app.api.protected_routes.get_jwt_identity", return_value=None):
+        yield
