@@ -34,3 +34,13 @@ def expired_token_response(jwt_header, jwt_payload):
         "success" : False,
         "message" : "Token expirado."
         }), 401
+
+@jwt.unauthorized_loader
+def missing_auth_header(message):
+
+    message = "Header de autorização não encontrado"
+
+    return jsonify({
+        "success" : False,
+        "message" : message
+    }), 401
