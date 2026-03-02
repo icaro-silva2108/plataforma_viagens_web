@@ -1,6 +1,5 @@
 from app.database.connection import get_connection
 import uuid
-from unittest.mock import patch
 
 # Teste da rota protegida profile com método Get
 def test_get_profile_route(user_tokens):

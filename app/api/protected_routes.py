@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt, create_access_token
+from flask_jwt_extended import jwt_required
 from app.services import user_service, reservation_service, utilities, security
+from app.api.auth import get_access_token_identity, get_refresh_id, send_access_token
 
 protected_routes = Blueprint("protected_routes", __name__)
 
@@ -9,7 +10,7 @@ protected_routes = Blueprint("protected_routes", __name__)
 def myprofile():
 
     # ID usuário
-    user_id = get_jwt_identity()
+    user_id = get_access_token_identity()
 
     # Caso erro de autorização
     if not user_id:
@@ -45,7 +46,7 @@ def myprofile():
 def create_reservation():
 
     # ID usuário
-    user_id = get_jwt_identity()
+    user_id = get_access_token_identity()
 
     # Caso erro de autorização
     if not user_id:
@@ -107,7 +108,7 @@ def create_reservation():
 def show_user_reservations():
 
     # ID usuário
-    user_id = get_jwt_identity()
+    user_id = get_access_token_identity()
 
     # Caso erro de autorização
     if not user_id:
@@ -148,7 +149,7 @@ def show_user_reservations():
 def cancel_reservation(res_id):
 
     # ID usuário
-    user_id = get_jwt_identity()
+    user_id = get_access_token_identity()
 
     # Caso erro de autorização
     if not user_id:
@@ -176,7 +177,7 @@ def cancel_reservation(res_id):
 def update_profile():
 
     # ID usuário
-    user_id = get_jwt_identity()
+    user_id = get_access_token_identity()
 
     # Caso erro de autorização
     if not user_id:
@@ -315,7 +316,7 @@ def update_profile():
 def delete_user():
 
     # ID usuário
-    user_id = get_jwt_identity()
+    user_id = get_access_token_identity()
 
     # Caso erro de autorização
     if not user_id:
@@ -344,7 +345,7 @@ def delete_user():
             }), 500
 
     # ID refresh token
-    refresh_id = get_jwt().get("refresh_id")
+    refresh_id = get_refresh_id()
 
     # Confirmação de revogação
     revoke_confirm = utilities.add_revoked_tokens(refresh_id)
@@ -365,10 +366,10 @@ def refresh():
 
     try:
         # ID usuário
-        user_id = get_jwt_identity()
+        user_id = get_access_token_identity()
 
         # Novo access token que mantém sessão
-        new_access_token = create_access_token(identity=user_id)
+        new_access_token = send_access_token(user_id)
         return jsonify({
             "success" : True,
             "access_token" : new_access_token
@@ -387,7 +388,7 @@ def logout():
     try:
 
         # ID refresh token
-        refresh_id = get_jwt().get("refresh_id")
+        refresh_id = get_refresh_id()
 
         # Confirmação de revogação
         revoke_confirm = utilities.add_revoked_tokens(refresh_id)

@@ -1,8 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.services import user_service, destination_service, utilities, security
-from flask_jwt_extended import create_access_token, create_refresh_token
 from app.api.limiter import limiter
-import uuid
+from app.api.auth import send_access_token, send_refresh_token
 
 public_routes = Blueprint("public_routes", __name__)
 
@@ -121,10 +120,8 @@ def sign_in():
             }), 401
 
     # Cria tokens de usuário se autenticação for bem sucedida
-    access_token = create_access_token(identity=str(logged["id"]))
-
-    refresh_id = str(uuid.uuid4())
-    refresh_token = create_refresh_token(identity=str(logged["id"]), additional_claims={"refresh_id" : refresh_id})
+    access_token = send_access_token(logged["id"])
+    refresh_token = send_refresh_token(logged["id"])
 
     return jsonify({
         "success" : True,
