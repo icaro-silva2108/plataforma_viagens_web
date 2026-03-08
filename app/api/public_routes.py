@@ -43,6 +43,12 @@ def sign_up():
             }), 409
 
     #Senha
+    if len(password) < 8:
+        return jsonify({
+            "success" : False,
+            "message" : "A senha precisa ter pelo menos 8 dígitos."
+            }), 400
+
     if password != password_confirm:
         return jsonify({
             "success" : False,
