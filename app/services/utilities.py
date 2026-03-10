@@ -134,7 +134,7 @@ def search_user_reservation(user_id):# --> Busca se usuário tem reservas
         cursor.execute(reservation_query, (user_id, ))
         reservation_rows = cursor.fetchone()[0]
 
-        return reservation_rows == 0
+        return reservation_rows > 0
 
     finally:
         if cursor:
