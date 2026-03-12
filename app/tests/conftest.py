@@ -66,6 +66,37 @@ def auth_fixture(client_no_ratelimit):
         if conn:
             conn.close()
 
+# Fixture sem cleanup para testar sucesso da rota DELETE profile
+@pytest.fixture(scope="function", name="user_data_no_cleanup")
+def auth_without_cleanup(client_no_ratelimit):
+
+    email = f"teste@{str(uuid.uuid4())}.com"
+
+    client = client_no_ratelimit
+    response_signup = client.post("/api/signup", json={
+        "name" : "teste",
+        "email" : email,
+        "password" : "teste123",
+        "password_confirm" : "teste123",
+        "birth_date" : "2000-01-01"
+    })
+
+    response_signin = client.post("/api/signin", json={
+        "email" : email,
+        "password" : "teste123"
+    })
+
+    assert response_signup.status_code == 201
+    assert response_signin.status_code == 200
+
+    user_id = response_signin.json["user_id"]
+
+    yield {
+        "client" : client,
+        "user_id" : user_id,
+        "refresh_token" : response_signin.json["refresh_token"]
+    }
+
 @pytest.fixture(scope="function")
 def mock_none_identity_token():
 
