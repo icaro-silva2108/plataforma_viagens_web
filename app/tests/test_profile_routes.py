@@ -33,7 +33,7 @@ def test_get_profile_authorization_error(client_no_ratelimit):
     assert response.json["message"] == "Header de autorização não encontrado"
 
 # Testa rota sem identidade do token
-def test_get_profile_none_identity(user_tokens, mock_none_identity_fixture):
+def test_get_profile_none_identity(user_tokens, mock_none_identity_token):
 
     access_token = user_tokens.get("access_token")
 
@@ -101,7 +101,7 @@ def test_patch_profile_authorization_error(client_no_ratelimit):
     assert response.json["message"] == "Header de autorização não encontrado"
 
 # Testa rota sem identidade do token
-def test_patch_profile_none_identity(user_tokens, mock_none_identity_fixture):
+def test_patch_profile_none_identity(user_tokens, mock_none_identity_token):
 
     access_token = user_tokens.get("access_token")
 
@@ -241,3 +241,94 @@ def test_patch_profile_data_treatment(user_tokens):
     assert invalid_password_lenght_response.json["message"] == "A senha precisa ter pelo menos 8 dígitos."
     assert invalid_birth_date_format_response.json["message"] == "Formato de data inválido (dd/mm/aaaa)."
     assert invalid_age_response.json["message"] == "A data a ser alterada deve representar pelo menos 16 anos."
+
+
+"""
+Testes rota profile com método DELETE
+"""
+
+# Testa sucesso no cancelamento do cadastro
+def test_delete_profile_success(user_data_no_cleanup):
+
+    client = user_data_no_cleanup.get("client")
+    refresh_token = user_data_no_cleanup.get("refresh_token")
+
+    delete_response = client.delete("/api/profile", headers={
+        "Authorization" : "Bearer {}".format(refresh_token)
+    })
+
+    assert delete_response is not None
+    assert delete_response.status_code == 200
+    assert delete_response.json["success"] is True
+    assert delete_response.json["message"] == "Cadastro cancelado com sucesso."
+
+# Testa rota sem o header de autorização
+def test_delete_profile_authorization_error(client_no_ratelimit):
+
+    client = client_no_ratelimit
+    response = client.delete("/api/profile")
+
+    assert response is not None
+    assert response.status_code == 401
+    assert response.json["success"] is False
+    assert response.json["message"] == "Header de autorização não encontrado"
+
+# Testa rota sem identidade do token
+def test_delete_profile_none_identity(user_tokens, mock_none_identity_token):
+
+    client = user_tokens.get("client")
+    refresh_token = user_tokens.get("refresh_token")
+
+    response = client.delete("/api/profile", headers={
+        "Authorization" : "Bearer {}".format(refresh_token)
+    })
+
+    assert response is not None
+    assert response.status_code == 401
+    assert response.json["success"] is False
+    assert response.json["message"] == "Usuário não existe ou não está autorizado"
+
+# Testa exclusão de perfil com reservas ainda ativas
+def test_delete_user_with_reservations(user_tokens, mock_user_reservation_true):
+
+    client = user_tokens.get("client")
+    refresh_token = user_tokens.get("refresh_token")
+
+    try_delete_response = client.delete("/api/profile", headers={
+        "Authorization" : "Bearer {}".format(refresh_token)
+    })
+
+    assert try_delete_response is not None
+    assert try_delete_response.status_code == 400
+    assert try_delete_response.json["success"] is False
+    assert try_delete_response.json["message"] == "Não é possível cancelar cadastro com reservas ativas."
+
+# Testa falha na exclusão do perfil
+def test_delete_user_failed(user_tokens, mock_delete_user_none):
+
+    client = user_tokens.get("client")
+    refresh_token = user_tokens.get("refresh_token")
+
+    delete_response = client.delete("api/profile", headers={
+        "Authorization" : "Bearer {}".format(refresh_token)
+    })
+
+    assert delete_response is not None
+    assert delete_response.status_code == 500
+    assert delete_response.json["success"] is False
+    assert delete_response.json["message"] == "Não foi possível excluir o cadastro."
+
+# Testa falha ao revogar refresh_token
+def test_delete_profile_revoked_failed(user_tokens, mock_add_revoked_tokens_none):
+
+    client = user_tokens.get("client")
+    refresh_token = user_tokens.get("refresh_token")
+
+    delete_response = client.delete("api/profile", headers={
+        "Authorization" : "Bearer {}".format(refresh_token)
+    })
+
+    assert delete_response is not None
+    assert delete_response.status_code == 500
+    assert delete_response.json["success"] is False
+    assert delete_response.json["message"] == "Não foi possível revogar o Refresh Token."
