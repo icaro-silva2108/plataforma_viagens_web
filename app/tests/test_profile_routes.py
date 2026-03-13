@@ -47,6 +47,20 @@ def test_get_profile_none_identity(user_tokens, mock_none_identity_token):
     assert response.json["success"] is False
     assert response.json["message"] == "Usuário não existe ou não está autorizado"
 
+# Testa rota com falha ao buscar usuário
+def test_search_user_failed(user_tokens, mock_search_user_by_id_none):
+
+    client = user_tokens.get("client")
+    access_token = user_tokens.get("access_token")
+
+    response = client.get("/api/profile", headers={
+        "Authorization" : "Bearer {}".format(access_token)
+    })
+
+    assert response is not None
+    assert response.status_code == 404
+    assert response.json["success"] is False
+    assert response.json["message"] == "Usuário não encontrado."
 
 """
 Testes rota profile com método PATCH
@@ -242,6 +256,23 @@ def test_patch_profile_data_treatment(user_tokens):
     assert invalid_birth_date_format_response.json["message"] == "Formato de data inválido (dd/mm/aaaa)."
     assert invalid_age_response.json["message"] == "A data a ser alterada deve representar pelo menos 16 anos."
 
+# Testa rota com falha na alteração do cadastro
+def test_patch_profile_failed(user_tokens, mock_change_user_info_none):
+
+    client = user_tokens.get("client")
+    access_token = user_tokens.get("access_token")
+
+    response = client.patch("/api/profile", json={
+        "name" : "novonome"
+    },
+    headers={
+        "Authorization" : "Bearer {}".format(access_token)
+    })
+
+    assert response is not None
+    assert response.status_code == 500
+    assert response.json["success"] is False
+    assert response.json["message"] == "Não foi possível alterar os dados."
 
 """
 Testes rota profile com método DELETE

@@ -126,3 +126,17 @@ def mock_add_revoked_tokens_none():
 
     with patch("app.api.protected_routes.utilities.add_revoked_tokens", return_value=None):
         yield
+
+# Mock que força search_user_by_id retornar None
+@pytest.fixture(scope="function")
+def mock_search_user_by_id_none():
+
+    with patch("app.api.protected_routes.utilities.search_user_by_id", return_value=None):
+        yield
+
+# Mock que força change_user_info retornar None
+@pytest.fixture(scope="function")
+def mock_change_user_info_none():
+
+    with patch("app.api.protected_routes.user_service.change_user_info", return_value=None):
+        yield
