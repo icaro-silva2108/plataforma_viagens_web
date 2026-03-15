@@ -1,6 +1,4 @@
-from app.database.connection import get_connection
 import uuid
-import pytest
 
 """
 Testes rota profile com método GET
@@ -68,17 +66,11 @@ Testes rota profile com método PATCH
 
 # Testa requisição bem sucedida
 def test_patch_profile_route(user_tokens):
-    conn = None
-    cursor = None
-    email = None
 
-    try:
-        conn = get_connection()
-        cursor = conn.cursor()
         email = f"email@{str(uuid.uuid4())}.com"
-
         client = user_tokens.get("client")
         access_token = user_tokens.get("access_token")
+
         response = client.patch("/api/profile", json={
             "name" : "novo nome",
             "email" : email,
@@ -94,12 +86,6 @@ def test_patch_profile_route(user_tokens):
         assert response.status_code == 200
         assert response.json["success"] is True
         assert response.json["message"] == "Dados alterados com sucesso."
-
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
 
 # Testa rota sem o header de autorização
 def test_patch_profile_authorization_error(client_no_ratelimit):

@@ -97,6 +97,41 @@ def auth_without_cleanup(client_no_ratelimit):
         "refresh_token" : response_signin.json["refresh_token"]
     }
 
+# Fixture de criação de destino para teste de criação de reservas
+@pytest.fixture(scope="function")
+def create_fake_destination():
+
+    conn = None
+    cursor = None
+    fake_id = None
+
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        if cursor:
+            cursor.execute("""
+                        INSERT INTO destinations
+                        (city, country, description, price)
+                        VALUES (%s, %s, %s, %s);""",
+                        ("test_city", "test_country", "test_description", 1.00))
+            if conn:
+                conn.commit()
+                fake_id = cursor.lastrowid
+       
+        yield{
+            "fake_destination_id" : fake_id
+        }
+
+    finally:
+        if cursor and fake_id:
+            cursor.execute("DELETE FROM destinations WHERE id = %s;", (fake_id, ))
+
+            if conn:
+                conn.commit()
+                cursor.close()
+                conn.close()
+
 """Fixtures de Mocks para os testes"""
 
 # Mock que força get_token_identity retornar None
