@@ -1,37 +1,17 @@
 # :pencil2: Descrição
-Projeto pessoal de plataforma de viagens web que envolve funções como:  
-- Criar cadastro  
-- Acessar o cadastro  
-- Cancelar cadastro  
-- Alterar informações de cadastro  
-- Criar reserva  
-- Listar reservas  
-- Cancelar reservas  
-- Listar possíveis destinos
+API REST para gerenciamento de usuários, reservas e destinos, com foco em autenticação, segurança e testes.  
+O projeto conta com funcionalidades como:
+- Cadastro de Usuários  
+- Login e Autenticação  
+- Cancelamento de Cadastro e Atualização de Informações  
+- Listagem, Criação e Cancelamento de Reservas   
+- Listagem de destinos
 
 # :iphone: Tecnologias Utilizadas:
 - Python  
 - MySQL  
 - Flask  
 - Pytest
-
-## :books: Bibliotecas Utilizadas(Até o momento)
-
-### :cd: Bibliotecas Python:
-- os(Para variáveis de ambiente - Complementar dotenv)  
-- datetime(Conversão para objeto data e verificação de datas válidas)  
-- re(Validação de formato de email)  
-- uuid(Geração de ID aleatório para blacklist de tokens)  
-- unittest(Para auxiliar testes com mocks)
-
-### :dvd: Bibliotecas Externas
-- mysql.connector(Integrar o Python ao banco MySQL)  
-- dotenv(Ocultar dados sensíveis)  
-- bcrypt(Hasheamento de senhas e validação para login)  
-- flask(Para requests e reponses em json, blueprint de rotas)  
-- flask-jwt-extended(Para autenticação com JWT e configuração do manager JWT)  
-- flask_limiter(Rate limit de requisições das rotas)  
-- pytest(Testes Automatizados)
 
 # :bookmark_tabs: Estrutura do Projeto
 - app/  
@@ -41,18 +21,11 @@ Projeto pessoal de plataforma de viagens web que envolve funções como:
     - services/: Regras de negócio, utilities e security(para hasheamento de senhas)
 
 # :chart_with_upwards_trend: Objetivo do Projeto
-O objetivo é consolidar na prática conhecimentos de programação e banco de dados por meio do desenvolvimento de um sistema próximo
-de uma situação real e desafiadora para meu começo. A aplicação ajuda a entender e executar fundamentos de SQL como CRUD básico, integração MySQL - Python.
-Além disso, o projeto serve como base de evolução para atribuição de API utilizando Flask, possibilitando a criação de uma interface Web e 
-aprofundando na comunicação entre camadas e manipulação de dados em um contexto mais próximo ao ambiente profissional.
-Trata-se de um projeto visando o desenvolvimento pessoal e a possibilidade de dar mais um passo à frente de conseguir
-consolidar a minha formação como desenvolvedor.
+O objetivo do projeto é aprofundar conhecimentos de desenvolvimento backend/web e estruturação de APIs REST, conexão com banco de dados relacional, autenticação via JWT, testes de software e controle de acesso a rotas protegidas. Inicialmente o projeto foi planejado como fullstack, mas por meio de uma decisão foi reestruturado para o foco exclusivo em backend, visando aprofundamento técnico e boas práticas.
 
 # :hourglass: Próximos Passos
 - Finalizar testes automatizados.  
 - Atualizar documentação ao longo do projeto.  
-- Posteriormente, foco em desenvolvimento frontend.
-
 
 # :computer: Como Rodar o Projeto Localmente
 
@@ -129,4 +102,53 @@ Running on http://127.0.0.1:5000
 Exemplo(Rota pública, não precisa de autenticação):
 ```console
 GET http://127.0.0.1:5000/api/destinations
+```
+
+A resposta deve ser:  
+```JSON
+{
+  "destinations": [
+    {
+      "city": "Paris",
+      "country": "França",
+      "description": "Conheça a Torre Eiffel, museus e a cultura francesa.",
+      "id": 2,
+      "img_url": null,
+      "price": 4500.0
+    },
+    {
+      "city": "Nova York",
+      "country": "Estados Unidos",
+      "description": "Explore a Times Square, Central Park e Broadway.",
+      "id": 3,
+      "img_url": null,
+      "price": 5200.0
+    },
+    {
+      "city": "Tóquio",
+      "country": "Japão",
+      "description": "Tecnologia, tradição e gastronomia japonesa.",
+      "id": 4,
+      "img_url": null,
+      "price": 6100.0
+    },
+    {
+      "city": "Rio de Janeiro",
+      "country": "Brasil",
+      "description": "Praias, Cristo Redentor e vida cultural intensa.",
+      "id": 5,
+      "img_url": null,
+      "price": 2800.0
+    },
+    {
+      "city": "Roma",
+      "country": "Itália",
+      "description": "História, Coliseu e culinária italiana.",
+      "id": 6,
+      "img_url": null,
+      "price": 4300.0
+    }
+  ],
+  "success": true
+}
 ```
