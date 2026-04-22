@@ -227,7 +227,14 @@ def mock_create_reservation_none():
 
 # Mock que cria side effect para levantar erro em send_access_token
 @pytest.fixture(scope="function")
-def mock_exception_access_token():
+def mock_exception_send_access_token():
 
     with patch("app.api.protected_routes.send_access_token", side_effect=Exception("Erro simulado")):
+        yield
+
+# Mock que cria side effect para levantar erro em add_revoked_tokens
+@pytest.fixture(scope="function")
+def mock_exception_add_revoked_tokens():
+
+    with patch("app.api.protected_routes.utilities.add_revoked_tokens", side_effect=Exception("Erro simulado")):
         yield
