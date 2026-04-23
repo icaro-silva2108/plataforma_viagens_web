@@ -8,6 +8,8 @@
 ![password_confirm_error](/imgs/postman_tests/password_confirm_error.png)
 - Data para criação de conta inválida  
 ![invalid_birth_date](/imgs/postman_tests/invalid_birth_date.png)
+- Resposta de sucesso no cadastro
+![signup_success](/imgs/postman_tests/signup_success.png)
 - Com todos dados sem erro de formato/confirmação é possível fazer o login  
 ![successful_login](/imgs/postman_tests/successful_login.png)
 - Tentativa de criar reserva sem token  
