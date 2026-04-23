@@ -161,3 +161,17 @@ A resposta deve ser:
   "success": true
 }
 ```
+# :soon: Considerações Finais do Projeto
+A API foi desenvolvida com foco em comunicação entre camadas, arquitetura REST, autenticação e autorização, proteção de rotas, divisão de responsabilidades, métodos HTTP e conexão com banco de dados.
+Alguns conceitos foram aplicados em nível introdutório e compõem pontos de aprofundamento para os próximos projetos:
+
+- Segurança: rate limiting, proteção contra SQL injection e autenticação via JWT foram implementados, mas há camadas mais avançadas a explorar
+- Arquitetura: houve uma preocupação com separação de responsabilidades e organização do código, com espaço para evoluir em direção a padrões mais consolidados como Clean Architecture
+- Boas práticas: aplicadas onde o conhecimento atual permitiu, com consciência de que há muito a amadurecer  
+
+Além disso, ficaram fora do escopo desta versão por decisão intencional:
+
+- Cacheamento externo via Redis/Memcached
+- Containerização com Docker
+
+Cada um desses tópicos será abordado em projetos futuros, construindo conhecimentos mais alinhados com o ambiente profissional em produção.
